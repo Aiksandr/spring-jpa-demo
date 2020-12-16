@@ -10,6 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Slf4j
 @SpringBootApplication
 public class DemoApplication {
@@ -24,11 +28,21 @@ public class DemoApplication {
 	@Bean
 	CommandLineRunner runnerScheduler() {
 		return args -> {
-			final Pageable pageable = PageRequest.of(1, 20);
-			final Page<ReportProjection> reports = reportRepository.search(pageable);
-			for (ReportProjection reportProjection : reports) {
-				log.info("test {}", reportProjection.getCreateDate());
+			reportRepository.save(new Report("1"));
+			reportRepository.save(new Report("2"));
+			reportRepository.save(new Report("3"));
+
+			final Pageable pageable = PageRequest.of(0, 20);
+			final Page<ReportProjection> page = reportRepository.search(pageable);
+
+
+			log.info("Size of stream {}", page.getNumberOfElements());
+			final List<ReportProjection> content = page.getContent();
+			for (ReportProjection reportProjection : content) {
+				log.info("test {} {}", reportProjection.getId(), reportProjection.getCreateDate());
 			}
+
+
 		};
 	}
 
